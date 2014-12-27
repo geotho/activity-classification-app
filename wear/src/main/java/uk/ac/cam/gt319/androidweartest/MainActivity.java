@@ -9,6 +9,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -82,9 +83,6 @@ public class MainActivity extends Activity implements SensorEventListener {
       }
     });
 
-//    Log.d(TAG,
-//        String.format("%.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
-
     x.setText(String.format("%.2f", event.values[0]));
     y.setText(String.format("%.2f", event.values[1]));
     z.setText(String.format("%.2f", event.values[2]));
@@ -92,6 +90,18 @@ public class MainActivity extends Activity implements SensorEventListener {
 
   @Override
   public void onAccuracyChanged(Sensor sensor, int accuracy) {
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    senSensorManager.unregisterListener(this);
   }
 
   private GoogleApiClient buildGoogleApiClient() {
