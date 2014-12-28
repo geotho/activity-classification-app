@@ -48,10 +48,11 @@ public class AccelerometerDataBlob {
    * @param sensorEvent the sensorEvent from which to take the timestamp and accelData.
    */
   public synchronized boolean add(SensorEvent sensorEvent) {
-    if (count < capacity) {
+    if (!this.isFull()) {
       DATA[count] = makeByteArray(sensorEvent.timestamp, sensorEvent.values);
       count++;
-      return true;
+      // Return true if we are not yet full.
+      return !this.isFull();
     }
     return false;
   }
@@ -73,5 +74,9 @@ public class AccelerometerDataBlob {
         .putFloat(values[1])
         .putFloat(values[2])
         .array();
+  }
+
+  public boolean isFull() {
+    return count >= capacity;
   }
 }
