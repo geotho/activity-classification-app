@@ -1,4 +1,4 @@
-package uk.ac.cam.gt319.androidweartest;
+package uk.ac.cam.gt319.accelerometerdata;
 
 import android.app.Service;
 import android.content.Context;
