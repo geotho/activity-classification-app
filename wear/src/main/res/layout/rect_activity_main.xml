@@ -7,37 +7,13 @@
                 tools:context=".MainActivity"
                 tools:deviceIds="wear_square">
 
-    <!--<TextView android:id="@+id/text" android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content" android:text="@string/hello_square" />-->
-    <TextView
-        android:id="@+id/xAccel"
+    <ToggleButton
+        android:id="@+id/togglebutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="10dp"
-        android:text="@string/x"
-        android:textSize="32sp"/>
-
-    <TextView
-        android:id="@+id/yAccel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/xAccel"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        android:text="@string/y"
-        android:textSize="32sp"/>
-
-    <TextView
-        android:id="@+id/zAccel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/yAccel"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="10dp"
-        android:text="@string/z"
-        android:textSize="32sp"/>
-
+        android:textOn="Recording on"
+        android:textOff="Recording off"
+        android:onClick="onToggleClicked"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
