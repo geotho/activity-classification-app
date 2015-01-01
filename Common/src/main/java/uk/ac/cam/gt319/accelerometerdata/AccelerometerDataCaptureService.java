@@ -30,6 +30,7 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
   private SensorManager sensorManager;
   private Sensor accelerometer;
   private final int DEFAULT_CAPACITY = 3*60*30;
+  private final String TAG = "AccelerometerDataCaptureService";
 
   @Override
   public void onCreate() {
@@ -49,6 +50,7 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
+    Log.d(TAG, "Registering listener.");
     sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     return START_STICKY;
   }
@@ -86,7 +88,6 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
   }
 
   private GoogleApiClient buildGoogleApiClient() {
-    final String TAG = "WearDataLayer";
     return new GoogleApiClient.Builder(this)
         .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
           @Override
