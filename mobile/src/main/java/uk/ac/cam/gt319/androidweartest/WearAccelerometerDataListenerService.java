@@ -9,16 +9,21 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.Arrays;
 
+import uk.ac.cam.gt319.accelerometerdata.AccelerometerDataBlob;
+
 /**
  * Created by George on 15/12/14.
  */
 public class WearAccelerometerDataListenerService extends WearableListenerService {
 
+  private static final String TAG = "PhoneDataListener";
+
   @Override
   public void onDataChanged(DataEventBuffer dataEvents) {
+    Log.d(TAG, "onDataChanged called");
     for (DataEvent d : dataEvents) {
       DataMap dm = DataMap.fromByteArray(d.getDataItem().getData());
-      Log.d("PhoneDataListener", "onDataChanged: " + Arrays.toString(dm.getFloatArray("XYZ")));
+      AccelerometerDataBlob dataBlob = new AccelerometerDataBlob(dm.getByteArray("AccelDataFromWear"));
     }
   }
 }
