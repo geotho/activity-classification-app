@@ -14,6 +14,8 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataApi.DataItemResult;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
@@ -34,12 +36,15 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
 
   @Override
   public void onCreate() {
+    Log.d(TAG, "On Create called.");
     dataBlob = new AccelerometerDataBlob(DEFAULT_CAPACITY);
 
     googleApiClient = buildGoogleApiClient();
+    Log.d(TAG, "Google Api Client built.");
 
     sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+    Log.d(TAG, "Sensors registered.");
   }
 
   @Override
@@ -77,14 +82,22 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
   private void sendToPhone(AccelerometerDataBlob dataBlob) {
     googleApiClient.connect();
 
+    Log.d(TAG, "Attempting data put");
     PutDataMapRequest dataMap = PutDataMapRequest.create("/acceldata");
-    dataMap.getDataMap().putByteArray("AccelDataFromPhone", dataBlob.asByteArray());
+    dataMap.getDataMap().putByteArray("AccelDataFromWear", dataBlob.asByteArray());
     PutDataRequest request = dataMap.asPutDataRequest();
 
     PendingResult<DataItemResult> pendingResult = Wearable.DataApi
         .putDataItem(googleApiClient, request);
 
-    googleApiClient.disconnect();
+    pendingResult.setResultCallback(new ResultCallback<DataItemResult>() {
+      @Override
+      public void onResult(DataItemResult dataItemResult) {
+
+        Log.d(TAG, "Data result: " + dataItemResult.toString());
+        googleApiClient.disconnect();
+      }
+    });
   }
 
   private GoogleApiClient buildGoogleApiClient() {
