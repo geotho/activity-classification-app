@@ -58,8 +58,8 @@ public class AccelerometerDataBlob {
   }
 
   public byte[] asByteArray() {
-    byte[] flattened = new byte[5*capacity];
-    for (int i = 0; i < capacity; i++) {
+    byte[] flattened = new byte[20 * count];
+    for (int i = 0; i < count; i++) {
       for (int j = 0; j < 20; j++) {
         flattened[20*i+j] = DATA[i][j];
       }
