@@ -7,8 +7,6 @@ import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import java.util.Arrays;
-
 import uk.ac.cam.gt319.accelerometerdata.AccelerometerDataBlob;
 
 /**
