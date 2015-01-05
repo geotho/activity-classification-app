@@ -13,6 +13,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by George on 15/12/14.
@@ -31,9 +34,9 @@ public class WearAccelerometerDataListenerService extends WearableListenerServic
   }
 
   private void saveToDisk(byte[] dataBlobArray) {
-    Time now = new Time();
-    now.setToNow();
-    String filename = "20150104" +  ".dat";
+    DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+    Date date = new Date();
+    String filename = dateFormat.format(date);
     File dir = getStorageDir("accelData");
     dir.mkdirs();
     File file = new File(dir.getPath() + filename);
