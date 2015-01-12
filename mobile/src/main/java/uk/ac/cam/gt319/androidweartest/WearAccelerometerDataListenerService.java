@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,17 +35,17 @@ public class WearAccelerometerDataListenerService extends WearableListenerServic
   }
 
   private void saveToDisk(byte[] dataBlobArray) {
-    DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-    Date date = new Date();
-    String filename = dateFormat.format(date);
     File dir = getStorageDir("accelData");
-    dir.mkdirs();
+    DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHms");
+    String filename = "/" + dateFormat.format(new Date()) + ".dat";
     File file = new File(dir.getPath() + filename);
     Log.d(TAG, dir.getAbsolutePath());
     try {
       file.createNewFile();
       FileOutputStream f = new FileOutputStream(file);
+      Log.d(TAG, "Length of byte array: " + dataBlobArray.length);
       f.write(dataBlobArray);
+      Log.d(TAG, "Saved to " + file.getAbsolutePath());
       f.close();
     } catch (FileNotFoundException e) {
       Log.wtf(TAG, "Saving to disk - file not found", e);
@@ -56,9 +57,7 @@ public class WearAccelerometerDataListenerService extends WearableListenerServic
   private File getStorageDir(String albumName) {
     File file = new File(Environment.getExternalStoragePublicDirectory(
         Environment.DIRECTORY_DOCUMENTS), albumName);
-    if (!file.mkdirs()) {
-      Log.e(TAG, "Directory not created");
-    }
+    file.mkdirs();
     return file;
   }
 }
