@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 
@@ -21,8 +23,13 @@ public class MainActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    Spinner spinner = (Spinner) findViewById(R.id.spinner);
+    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        R.array.activities_array, android.R.layout.simple_spinner_item);
 
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+    spinner.setAdapter(adapter);
     Log.d(TAG, "created");
   }
 
