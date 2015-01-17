@@ -8,28 +8,22 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/xAccel"
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="George"
+        android:ems="10"
+        android:id="@+id/nameText"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="@string/x"/>
+        android:layout_marginTop="114dp"/>
 
-    <TextView
-        android:id="@+id/yAccel"
+    <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/y"/>
-
-    <TextView
-        android:id="@+id/zAccel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/z"/>
-
+        android:id="@+id/spinner"
+        android:layout_below="@+id/nameText"
+        android:layout_alignStart="@+id/nameText"
+        android:layout_marginTop="37dp"/>
 </RelativeLayout>

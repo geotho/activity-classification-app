@@ -10,4 +10,13 @@
     <string name="y">Y</string>
     <string name="z">Z</string>
 
+    <string-array name="activities_array">
+        <item>Walking</item>
+        <item>Running</item>
+        <item>StairsUp</item>
+        <item>StairsDown</item>
+        <item>Cycling</item>
+        <item>Other</item>
+    </string-array>
+
 </resources>

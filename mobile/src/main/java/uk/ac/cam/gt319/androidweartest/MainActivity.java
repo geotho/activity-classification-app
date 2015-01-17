@@ -15,18 +15,12 @@ public class MainActivity extends Activity {
   private static final String TAG = "MobileMainActivity";
   private SensorManager senSensorManager;
   private Sensor senAccelerometer;
-  private TextView x;
-  private TextView y;
-  private TextView z;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    x = (TextView) findViewById(R.id.xAccel);
-    y = (TextView) findViewById(R.id.yAccel);
-    z = (TextView) findViewById(R.id.zAccel);
 
 
     Log.d(TAG, "created");
