@@ -15,9 +15,9 @@
         android:text="George"
         android:ems="10"
         android:id="@+id/nameText"
+        android:layout_marginTop="31dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="114dp"/>
+        android:layout_centerHorizontal="true"/>
 
     <Spinner
         android:layout_width="wrap_content"
