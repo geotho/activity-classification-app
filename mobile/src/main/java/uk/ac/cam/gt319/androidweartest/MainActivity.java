@@ -11,10 +11,23 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageApi.SendMessageResult;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class MainActivity extends Activity {
 
   private static final String TAG = "MobileMainActivity";
+  private GoogleApiClient googleApiClient;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -54,4 +67,47 @@ public class MainActivity extends Activity {
     return super.onOptionsItemSelected(item);
   }
 
+  private void sendMessage() {
+    for (String s : getNodes()) {
+      Log.d(TAG, "Sending to node " + s);
+      SendMessageResult result =
+          Wearable.MessageApi.sendMessage(googleApiClient, s, "/start/MainActivity", null).await();
+      if (!result.getStatus().isSuccess()) {
+        Log.e(TAG, "ERROR: failed to send Message: " + result.getStatus());
+      }
+    }
+  }
+
+  private GoogleApiClient buildGoogleApiClient() {
+    return new GoogleApiClient.Builder(this)
+        .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+          @Override
+          public void onConnected(Bundle connectionHint) {
+            Log.d(TAG, "onConnected: " + connectionHint);
+          }
+
+          @Override
+          public void onConnectionSuspended(int cause) {
+            Log.d(TAG, "onConnectionSuspended: " + cause);
+          }
+        })
+        .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+          @Override
+          public void onConnectionFailed(ConnectionResult result) {
+            Log.d(TAG, "onConnectionFailed: " + result);
+          }
+        })
+        .addApi(Wearable.API)
+        .build();
+  }
+
+  private Collection<String> getNodes() {
+    Set<String> results = new HashSet<String>();
+    NodeApi.GetConnectedNodesResult nodes =
+        Wearable.NodeApi.getConnectedNodes(googleApiClient).await();
+    for (Node node : nodes.getNodes()) {
+      results.add(node.getId());
+    }
+    return results;
+  }
 }
