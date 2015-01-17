@@ -1,22 +1,27 @@
 package uk.ac.cam.gt319.androidweartest;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageApi.SendMessageResult;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.NodeApi.GetConnectedNodesResult;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.Collection;
@@ -37,6 +42,9 @@ public class MainActivity extends Activity {
     Spinner spinner = (Spinner) findViewById(R.id.spinner);
     ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
         R.array.activities_array, android.R.layout.simple_spinner_item);
+
+    googleApiClient = buildGoogleApiClient();
+    googleApiClient.connect();
 
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -67,14 +75,18 @@ public class MainActivity extends Activity {
     return super.onOptionsItemSelected(item);
   }
 
-  private void sendMessage() {
+  public void sendMessage(View view) {
     for (String s : getNodes()) {
       Log.d(TAG, "Sending to node " + s);
-      SendMessageResult result =
-          Wearable.MessageApi.sendMessage(googleApiClient, s, "/start/MainActivity", null).await();
-      if (!result.getStatus().isSuccess()) {
-        Log.e(TAG, "ERROR: failed to send Message: " + result.getStatus());
-      }
+      PendingResult<SendMessageResult> result =
+          Wearable.MessageApi.sendMessage(googleApiClient, s, "/start/MainActivity", null);
+
+      result.setResultCallback(new ResultCallback<SendMessageResult>() {
+        @Override
+        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+          Log.d(TAG, "Sent message");
+        }
+      });
     }
   }
 
@@ -102,12 +114,20 @@ public class MainActivity extends Activity {
   }
 
   private Collection<String> getNodes() {
-    Set<String> results = new HashSet<String>();
-    NodeApi.GetConnectedNodesResult nodes =
-        Wearable.NodeApi.getConnectedNodes(googleApiClient).await();
-    for (Node node : nodes.getNodes()) {
-      results.add(node.getId());
-    }
+    Log.d(TAG, "Getting nodes now");
+    final Set<String> results = new HashSet<String>();
+    PendingResult<GetConnectedNodesResult> result =
+        Wearable.NodeApi.getConnectedNodes(googleApiClient);
+
+    result.setResultCallback(new ResultCallback<GetConnectedNodesResult>() {
+      @Override
+      public void onResult(GetConnectedNodesResult nodes) {
+        for (Node node : nodes.getNodes()) {
+          Log.d(TAG, "Adding node " + node.getId());
+          results.add(node.getId());
+        }
+      }
+    });
     return results;
   }
 }
