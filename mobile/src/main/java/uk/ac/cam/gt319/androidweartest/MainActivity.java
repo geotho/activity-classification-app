@@ -15,8 +15,6 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 
   private static final String TAG = "MobileMainActivity";
-  private SensorManager senSensorManager;
-  private Sensor senAccelerometer;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
