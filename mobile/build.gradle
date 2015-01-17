@@ -22,6 +22,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     wearApp project(':wear')
-    compile project(':Common')
+    compile project(':common')
     compile 'com.google.android.gms:play-services:+'
 }

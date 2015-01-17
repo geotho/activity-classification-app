@@ -1,1 +1,1 @@
-include ':mobile', ':wear', ':Common'
+include ':mobile', ':wear', 'common'
