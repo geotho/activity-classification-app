@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
 
   private Collection<String> getNodes() {
     Log.d(TAG, "Getting nodes now");
-    final Set<String> results = new HashSet<String>();
+    final Set<String> results = new HashSet<>();
     PendingResult<GetConnectedNodesResult> result =
         Wearable.NodeApi.getConnectedNodes(googleApiClient);
 
@@ -125,9 +125,20 @@ public class MainActivity extends Activity {
         for (Node node : nodes.getNodes()) {
           Log.d(TAG, "Adding node " + node.getId());
           results.add(node.getId());
+
+          PendingResult<SendMessageResult> result =
+              Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), "/start/MainActivity", null);
+
+          result.setResultCallback(new ResultCallback<SendMessageResult>() {
+            @Override
+            public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+              Log.d(TAG, "Sent message");
+            }
+          });
         }
       }
     });
+    Log.d(TAG, "results size = " + results.size());
     return results;
   }
 }
