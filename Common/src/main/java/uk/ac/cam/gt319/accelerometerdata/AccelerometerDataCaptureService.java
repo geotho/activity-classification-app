@@ -43,7 +43,7 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
     Log.d(TAG, "Google Api Client built.");
 
     sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-    accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+    accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     Log.d(TAG, "Sensors registered.");
   }
 
@@ -56,14 +56,16 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
     Log.d(TAG, "Registering listener.");
-    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
     return START_STICKY;
   }
 
   @Override
   public void onSensorChanged(SensorEvent event) {
     dataBlob.add(event);
+    Log.d(TAG, "Capacity is " + dataBlob.getCapacity());
     if (dataBlob.isFull()) {
+      Log.d(TAG, "We're full. Attempting data push.");
       sendToPhone(dataBlob);
       dataBlob = new AccelerometerDataBlob(DEFAULT_CAPACITY);
     }

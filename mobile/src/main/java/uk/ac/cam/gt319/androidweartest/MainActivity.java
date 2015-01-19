@@ -1,38 +1,32 @@
 package uk.ac.cam.gt319.androidweartest;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Chronometer;
 import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.MessageApi.SendMessageResult;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.NodeApi.GetConnectedNodesResult;
+import com.google.android.gms.wearable.MessageApi.MessageListener;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import uk.ac.cam.gt319.accelerometerdata.AccelerometerDataCaptureService;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements MessageListener{
 
   private static final String TAG = "MobileMainActivity";
   private GoogleApiClient googleApiClient;
+  private Chronometer chronometer;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +43,8 @@ public class MainActivity extends Activity {
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
     spinner.setAdapter(adapter);
+
+    chronometer = (Chronometer) findViewById(R.id.chronometer);
     Log.d(TAG, "created");
   }
 
@@ -75,27 +71,13 @@ public class MainActivity extends Activity {
     return super.onOptionsItemSelected(item);
   }
 
-  public void sendMessage(View view) {
-    for (String s : getNodes()) {
-      Log.d(TAG, "Sending to node " + s);
-      PendingResult<SendMessageResult> result =
-          Wearable.MessageApi.sendMessage(googleApiClient, s, "/start/MainActivity", null);
-
-      result.setResultCallback(new ResultCallback<SendMessageResult>() {
-        @Override
-        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-          Log.d(TAG, "Sent message");
-        }
-      });
-    }
-  }
-
   private GoogleApiClient buildGoogleApiClient() {
     return new GoogleApiClient.Builder(this)
         .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
           @Override
           public void onConnected(Bundle connectionHint) {
             Log.d(TAG, "onConnected: " + connectionHint);
+            registerListener();
           }
 
           @Override
@@ -113,32 +95,39 @@ public class MainActivity extends Activity {
         .build();
   }
 
-  private Collection<String> getNodes() {
-    Log.d(TAG, "Getting nodes now");
-    final Set<String> results = new HashSet<>();
-    PendingResult<GetConnectedNodesResult> result =
-        Wearable.NodeApi.getConnectedNodes(googleApiClient);
-
-    result.setResultCallback(new ResultCallback<GetConnectedNodesResult>() {
-      @Override
-      public void onResult(GetConnectedNodesResult nodes) {
-        for (Node node : nodes.getNodes()) {
-          Log.d(TAG, "Adding node " + node.getId());
-          results.add(node.getId());
-
-          PendingResult<SendMessageResult> result =
-              Wearable.MessageApi.sendMessage(googleApiClient, node.getId(), "/start/MainActivity", null);
-
-          result.setResultCallback(new ResultCallback<SendMessageResult>() {
-            @Override
-            public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-              Log.d(TAG, "Sent message");
-            }
-          });
+  @Override
+  public void onMessageReceived(MessageEvent messageEvent) {
+    Log.d(TAG, "Message received...");
+    Log.d(TAG, "Message path = " + messageEvent.getPath());
+    if (messageEvent.getPath().equals("/start/MainActivity")) {
+      Log.d(TAG, "Start message received.");
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          chronometer.setBase(SystemClock.elapsedRealtime());
+          chronometer.start();
+          Toast.makeText(MainActivity.this, "Started recording", Toast.LENGTH_SHORT).show();
         }
-      }
-    });
-    Log.d(TAG, "results size = " + results.size());
-    return results;
+      });
+//      startService(new Intent(this, AccelerometerDataCaptureService.class));
+    } else if (messageEvent.getPath().equals("/end/MainActivity")) {
+      Log.d(TAG, "Stop message received.");
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          chronometer.stop();
+          Toast.makeText(MainActivity.this, "Stopped recording", Toast.LENGTH_SHORT).show();
+        }
+      });
+//      stopService(new Intent(this, AccelerometerDataCaptureService.class));
+    }
   }
+
+  private void registerListener() {
+    Wearable.MessageApi.addListener(googleApiClient, this);
+    Log.d(TAG, "Message API listener added");
+  }
+
+
+
 }

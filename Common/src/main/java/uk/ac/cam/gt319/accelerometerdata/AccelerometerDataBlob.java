@@ -13,6 +13,11 @@ import java.nio.ByteBuffer;
 public class AccelerometerDataBlob {
   private final byte[][] DATA;
   private final int capacity;
+
+  public int getCapacity() {
+    return capacity;
+  }
+
   private int count;
 
   /**
