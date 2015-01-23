@@ -31,13 +31,12 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
   private AccelerometerDataBlob dataBlob;
   private SensorManager sensorManager;
   private Sensor accelerometer;
-  private final int DEFAULT_CAPACITY = 3*60*30;
   private final String TAG = "AccelerometerDataCaptureService";
 
   @Override
   public void onCreate() {
     Log.d(TAG, "On Create called.");
-    dataBlob = new AccelerometerDataBlob(DEFAULT_CAPACITY);
+    dataBlob = new AccelerometerDataBlob();
 
     googleApiClient = buildGoogleApiClient();
     Log.d(TAG, "Google Api Client built.");
