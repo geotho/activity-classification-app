@@ -7,19 +7,32 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataApi.DataItemResult;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Listener for accelerometer data. Stores data in an {@link AccelerometerDataBlob}.
@@ -36,7 +49,7 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
   @Override
   public void onCreate() {
     Log.d(TAG, "On Create called.");
-    dataBlob = new AccelerometerDataBlob();
+    dataBlob = new AccelerometerDataBlob(new File(getFilesDir(), genFilename()));
 
     googleApiClient = buildGoogleApiClient();
     Log.d(TAG, "Google Api Client built.");
@@ -61,12 +74,10 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
 
   @Override
   public void onSensorChanged(SensorEvent event) {
-    dataBlob.add(event);
-    Log.d(TAG, "Capacity is " + dataBlob.getCapacity());
-    if (dataBlob.isFull()) {
-      Log.d(TAG, "We're full. Attempting data push.");
-      sendToPhone(dataBlob);
-      dataBlob = new AccelerometerDataBlob(DEFAULT_CAPACITY);
+    try {
+      dataBlob.add(event);
+    } catch (IOException e) {
+      Log.e(TAG, "Adding failed", e);
     }
   }
 
@@ -80,22 +91,29 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
     return null;
   }
 
-  private void sendToPhone(AccelerometerDataBlob dataBlob) {
+  private void sendToPhone(AccelerometerDataBlob dataBlob)  {
     googleApiClient.connect();
+    dataBlob.done();
 
     Log.d(TAG, "Attempting data put");
-    PutDataMapRequest dataMap = PutDataMapRequest.create("/acceldata");
-    dataMap.getDataMap().putByteArray("AccelDataFromWear", dataBlob.asByteArray());
-    PutDataRequest request = dataMap.asPutDataRequest();
+    PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/acceldata");
+    ParcelFileDescriptor parcelFileDescriptor = null;
+    try {
+      parcelFileDescriptor = ParcelFileDescriptor.open(dataBlob.getFile(), ParcelFileDescriptor.MODE_READ_ONLY);
+    } catch (FileNotFoundException e) {
+      Log.e(TAG, "File not found.", e);
+    }
+    Asset asset = Asset.createFromFd(parcelFileDescriptor);
+    dataMapRequest.getDataMap().putAsset("AccelDataFromWear", asset);
 
     PendingResult<DataItemResult> pendingResult = Wearable.DataApi
-        .putDataItem(googleApiClient, request);
+        .putDataItem(googleApiClient, dataMapRequest.asPutDataRequest());
 
     pendingResult.setResultCallback(new ResultCallback<DataItemResult>() {
       @Override
       public void onResult(DataItemResult dataItemResult) {
 
-        Log.d(TAG, "Data result: " + dataItemResult.toString());
+        Log.d(TAG, "Data result: " + dataItemResult.getDataItem());
         googleApiClient.disconnect();
       }
     });
@@ -122,5 +140,11 @@ public class AccelerometerDataCaptureService extends Service implements SensorEv
         })
         .addApi(Wearable.API)
         .build();
+  }
+
+  private String genFilename() {
+    DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHms");
+    String filename = dateFormat.format(new Date()) + ".tmp";
+    return filename;
   }
 }

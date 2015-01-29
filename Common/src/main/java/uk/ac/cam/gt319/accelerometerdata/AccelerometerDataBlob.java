@@ -1,8 +1,10 @@
 package uk.ac.cam.gt319.accelerometerdata;
 
 import android.hardware.SensorEvent;
+import android.util.Log;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,21 +16,23 @@ import java.nio.ByteBuffer;
  */
 public class AccelerometerDataBlob {
 
+  private static final String TAG = "AccelerometerDataBlob";
   private int count;
   private BufferedOutputStream output;
-  private FileDescriptor fileDescriptor;
+  private File file;
 
   /**
    * Create a new, empty AccelerometerDataBlob.
    */
-  public AccelerometerDataBlob(FileOutputStream fileOutputStream) {
+  public AccelerometerDataBlob(File file) {
     this.count = 0;
+    this.file = file;
     try {
-      fileDescriptor = fileOutputStream.getFD();
-      output = new BufferedOutputStream(fileOutputStream);
+      output = new BufferedOutputStream(new FileOutputStream(file));
     } catch (Exception e) {
       e.printStackTrace();
     }
+    Log.d(TAG, "Free space: " + file.getFreeSpace());
   }
 
   /**
@@ -38,6 +42,8 @@ public class AccelerometerDataBlob {
   public void add(SensorEvent sensorEvent) throws IOException {
     output.write(makeByteArray(sensorEvent.timestamp, sensorEvent.values));
     count++;
+
+//    Log.d(TAG, sensorEvent.timestamp + " successfully written to file.");
   }
 
   public byte[] makeByteArray(long timestamp, float[] values) {
@@ -49,8 +55,18 @@ public class AccelerometerDataBlob {
         .array();
   }
 
-  public FileDescriptor getFileDescriptor() {
-    return fileDescriptor;
+  public void done() {
+    try {
+      output.flush();
+      output.close();
+      Log.d(TAG, "Blob successfully closed file.");
+    } catch (IOException e) {
+      Log.e(TAG, "IOException in Done", e);
+    }
+  }
+
+  public File getFile() {
+    return file;
   }
 
   public int getCount() {
