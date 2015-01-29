@@ -45,9 +45,7 @@ public class MainActivity extends Activity {
   }
 
   public void onToggleClicked(View view) {
-    Log.d(TAG, "Button state is " + button.isChecked());
     if (((ToggleButton) view).isChecked()) {
-      Log.d(TAG, "Registering listener.");
       startService(new Intent(this, AccelerometerDataCaptureService.class));
       sendMessageToNodes("start");
     } else {
