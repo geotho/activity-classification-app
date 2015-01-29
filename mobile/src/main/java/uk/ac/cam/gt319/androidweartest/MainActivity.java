@@ -22,7 +22,7 @@ import com.google.android.gms.wearable.Wearable;
 import uk.ac.cam.gt319.accelerometerdata.AccelerometerDataCaptureService;
 
 
-public class MainActivity extends Activity implements MessageListener{
+public class MainActivity extends Activity implements MessageListener {
 
   private static final String TAG = "MobileMainActivity";
   private GoogleApiClient googleApiClient;
