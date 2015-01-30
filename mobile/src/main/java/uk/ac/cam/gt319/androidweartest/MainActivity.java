@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageApi.MessageListener;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
@@ -113,7 +112,10 @@ public class MainActivity extends Activity implements MessageListener {
           Toast.makeText(MainActivity.this, "Started recording", Toast.LENGTH_SHORT).show();
         }
       });
-//      startService(new Intent(this, AccelerometerDataCaptureService.class));
+      startService(new Intent(this, PhoneAccelerometerDataCaptureService.class)
+          .setAction(PhoneAccelerometerDataCaptureService.SET_FILE_NAME_ACTION)
+          .putExtra("username", getUserName())
+          .putExtra("useractivity", getUserActivity()));
     } else if (messageEvent.getPath().equals("/end/MainActivity")) {
       Log.d(TAG, "Stop message received.");
       runOnUiThread(new Runnable() {
@@ -123,7 +125,7 @@ public class MainActivity extends Activity implements MessageListener {
           Toast.makeText(MainActivity.this, "Stopped recording", Toast.LENGTH_SHORT).show();
         }
       });
-//      stopService(new Intent(this, AccelerometerDataCaptureService.class));
+      stopService(new Intent(this, PhoneAccelerometerDataCaptureService.class));
     }
   }
 
@@ -141,11 +143,10 @@ public class MainActivity extends Activity implements MessageListener {
   }
 
   private void sendFilename() {
-    Intent sendIntent = new Intent(this, WearAccelerometerDataListenerService.class);
-    sendIntent.setAction(WearAccelerometerDataListenerService.SET_FILE_NAME_ACTION);
-    sendIntent.putExtra("username", getUserName());
-    sendIntent.putExtra("useractivity", getUserActivity());
-    startService(sendIntent);
+    startService(new Intent(this, WearAccelerometerDataListenerService.class)
+        .setAction(WearAccelerometerDataListenerService.SET_FILE_NAME_ACTION)
+        .putExtra("username", getUserName())
+        .putExtra("useractivity", getUserActivity()));
   }
 
 }
