@@ -46,10 +46,10 @@ public class MainActivity extends Activity {
 
   public void onToggleClicked(View view) {
     if (((ToggleButton) view).isChecked()) {
-      startService(new Intent(this, AccelerometerDataCaptureService.class));
+      startService(new Intent(this, WearAccelerometerDataCaptureService.class));
       sendMessageToNodes("start");
     } else {
-      stopService(new Intent(this, AccelerometerDataCaptureService.class));
+      stopService(new Intent(this, WearAccelerometerDataCaptureService.class));
       sendMessageToNodes("end");
     }
   }
@@ -78,7 +78,7 @@ public class MainActivity extends Activity {
   }
 
   private void sendMessageToNodes(final String message) {
-    Log.d(TAG, "Getting nodes now");
+    Log.d(TAG, "Getting nodes now. Sending message " + message);
     PendingResult<NodeApi.GetConnectedNodesResult> result =
         Wearable.NodeApi.getConnectedNodes(googleApiClient);
 
