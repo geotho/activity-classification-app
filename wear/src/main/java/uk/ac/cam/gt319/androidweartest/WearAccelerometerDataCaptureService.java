@@ -33,13 +33,13 @@ public class WearAccelerometerDataCaptureService extends AccelerometerDataCaptur
 
   @Override
   public void onDestroy() {
-    sendToPhone(getDataBlob());
     getSensorManager().unregisterListener(this);
+    getDataBlob().done();
+    sendToPhone(getDataBlob());
   }
 
   private void sendToPhone(AccelerometerDataBlob dataBlob)  {
     googleApiClient.connect();
-    dataBlob.done();
 
     Log.d(TAG, "Attempting data put");
     PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/acceldata");
