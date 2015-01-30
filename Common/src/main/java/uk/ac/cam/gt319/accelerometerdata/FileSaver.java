@@ -27,7 +27,12 @@ public class FileSaver {
 
   private String genFilename() {
     DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHms");
-    return "/" + this.filename + "-" + dateFormat.format(new Date()) + ".dat";
+    return new StringBuilder()
+        .append('/')
+        .append(dateFormat.format(new Date()))
+        .append('-')
+        .append(this.filename)
+        .append(".dat").toString();
   }
 
   public void saveToDisk(File file) {
