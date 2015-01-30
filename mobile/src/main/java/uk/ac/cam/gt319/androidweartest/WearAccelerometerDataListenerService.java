@@ -1,5 +1,8 @@
 package uk.ac.cam.gt319.androidweartest;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -34,14 +37,27 @@ import java.util.concurrent.TimeUnit;
  */
 public class WearAccelerometerDataListenerService extends WearableListenerService {
 
+  public static final String SET_FILE_NAME_ACTION = "SET_FILE_NAME_ACTION";
+
   private static final String TAG = "PhoneDataListener";
   private GoogleApiClient googleApiClient;
+
+  private String fileName;
 
   @Override
   public void onCreate() {
     super.onCreate();
     Log.d(TAG, "onCreate of Data Listener Service called");
     googleApiClient = buildGoogleApiClient();
+  }
+
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    Log.d(TAG, "On Start of Data Listener Service called");
+    if (intent.getAction().equals(SET_FILE_NAME_ACTION)) {
+      setFileName(intent.getStringExtra("username") + "-" + intent.getStringExtra("useractivity"));
+    }
+    return super.onStartCommand(intent, flags, startId);
   }
 
   @Override
@@ -60,6 +76,7 @@ public class WearAccelerometerDataListenerService extends WearableListenerServic
 
   private void saveToDisk(Asset dataBlobAsset) {
     File dir = getStorageDir("accelData");
+    String filename = genFilename("");
     File file = new File(dir.getPath() + filename);
     Log.d(TAG, dir.getAbsolutePath());
     ConnectionResult result = googleApiClient.blockingConnect(5000, TimeUnit.MILLISECONDS);
@@ -127,7 +144,15 @@ public class WearAccelerometerDataListenerService extends WearableListenerServic
 
   private String genFilename(String prefix) {
     DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHms");
-    String filename = "/" + prefix + "-" + dateFormat.format(new Date()) + ".dat";
+    String filename = "/" + getFileName() + "-" + dateFormat.format(new Date()) + ".dat";
     return filename;
+  }
+
+  public String getFileName() {
+    return fileName;
+  }
+
+  public void setFileName(String fileName) {
+    this.fileName = fileName;
   }
 }

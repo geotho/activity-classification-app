@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Chronometer;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -26,6 +27,8 @@ public class MainActivity extends Activity implements MessageListener {
 
   private static final String TAG = "MobileMainActivity";
   private GoogleApiClient googleApiClient;
+  private Spinner activitySpinner;
+  private TextView userNameTextView;
   private Chronometer chronometer;
 
   @Override
@@ -33,18 +36,18 @@ public class MainActivity extends Activity implements MessageListener {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    Spinner spinner = (Spinner) findViewById(R.id.spinner);
+    activitySpinner = (Spinner) findViewById(R.id.spinner);
     ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
         R.array.activities_array, android.R.layout.simple_spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    activitySpinner.setAdapter(adapter);
+
+    userNameTextView = (TextView) findViewById(R.id.nameText);
+
+    chronometer = (Chronometer) findViewById(R.id.chronometer);
 
     googleApiClient = buildGoogleApiClient();
     googleApiClient.connect();
-
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-    spinner.setAdapter(adapter);
-
-    chronometer = (Chronometer) findViewById(R.id.chronometer);
     Log.d(TAG, "created");
   }
 
@@ -101,6 +104,7 @@ public class MainActivity extends Activity implements MessageListener {
     Log.d(TAG, "Message path = " + messageEvent.getPath());
     if (messageEvent.getPath().equals("/start/MainActivity")) {
       Log.d(TAG, "Start message received.");
+      sendFilename();
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -128,6 +132,20 @@ public class MainActivity extends Activity implements MessageListener {
     Log.d(TAG, "Message API listener added");
   }
 
+  private String getUserName() {
+    return userNameTextView.getText().toString();
+  }
 
+  private String getUserActivity() {
+    return activitySpinner.getSelectedItem().toString();
+  }
+
+  private void sendFilename() {
+    Intent sendIntent = new Intent(this, WearAccelerometerDataListenerService.class);
+    sendIntent.setAction(WearAccelerometerDataListenerService.SET_FILE_NAME_ACTION);
+    sendIntent.putExtra("username", getUserName());
+    sendIntent.putExtra("useractivity", getUserActivity());
+    startService(sendIntent);
+  }
 
 }
