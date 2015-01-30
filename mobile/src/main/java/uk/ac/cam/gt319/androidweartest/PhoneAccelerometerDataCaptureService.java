@@ -9,10 +9,10 @@ import uk.ac.cam.gt319.accelerometerdata.FileSaver;
 /**
  * Created by George on 30/01/15.
  */
-public class PhoneAcceleometerDataCaptureService extends AccelerometerDataCaptureService {
+public class PhoneAccelerometerDataCaptureService extends AccelerometerDataCaptureService {
 
   public static final String SET_FILE_NAME_ACTION = "SET_FILE_NAME_ACTION";
-  private static final String TAG = "PhoneAcceleometerDataCaptureService";
+  private static final String TAG = "PhoneAccelerometerDataCaptureService";
   private String filename;
 
   @Override
@@ -33,6 +33,6 @@ public class PhoneAcceleometerDataCaptureService extends AccelerometerDataCaptur
   }
 
   public void setFilename(String filename) {
-    this.filename = filename;
+    this.filename = "phone-" + filename;
   }
 }
