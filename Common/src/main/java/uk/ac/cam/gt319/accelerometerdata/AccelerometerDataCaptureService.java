@@ -61,7 +61,7 @@ public abstract class AccelerometerDataCaptureService extends Service implements
     accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     Log.d(TAG, "Sensors registered.");
     Log.d(TAG, "Registering listener.");
-    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
     return START_STICKY;
   }
 
