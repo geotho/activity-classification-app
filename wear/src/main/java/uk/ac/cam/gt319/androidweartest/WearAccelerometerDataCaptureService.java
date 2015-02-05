@@ -36,6 +36,7 @@ public class WearAccelerometerDataCaptureService extends AccelerometerDataCaptur
     getSensorManager().unregisterListener(this);
     getDataBlob().done();
     sendToPhone(getDataBlob());
+    getWakeLock().release();
   }
 
   private void sendToPhone(AccelerometerDataBlob dataBlob)  {

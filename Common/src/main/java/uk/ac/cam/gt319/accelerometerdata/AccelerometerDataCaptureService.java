@@ -10,6 +10,8 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -38,6 +40,11 @@ public abstract class AccelerometerDataCaptureService extends Service implements
   private SensorManager sensorManager;
   private Sensor accelerometer;
   private final String TAG = "AccelerometerDataCaptureService";
+  private WakeLock wakeLock;
+
+  public WakeLock getWakeLock() {
+    return wakeLock;
+  }
 
   public SensorManager getSensorManager() {
     return sensorManager;
@@ -59,6 +66,10 @@ public abstract class AccelerometerDataCaptureService extends Service implements
     dataBlob = new AccelerometerDataBlob(new File(getFilesDir(), genFilename()));
     sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+        "MyWakelockTag");
+    wakeLock.acquire();
     Log.d(TAG, "Sensors registered.");
     Log.d(TAG, "Registering listener.");
     sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);

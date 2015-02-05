@@ -30,6 +30,7 @@ public class PhoneAccelerometerDataCaptureService extends AccelerometerDataCaptu
     getDataBlob().done();
     FileSaver fileSaver = new FileSaver(this.filename);
     fileSaver.saveToDisk(getDataBlob().getFile());
+    getWakeLock().release();
   }
 
   public void setFilename(String filename) {
