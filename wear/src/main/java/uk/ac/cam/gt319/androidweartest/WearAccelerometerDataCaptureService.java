@@ -61,6 +61,7 @@ public class WearAccelerometerDataCaptureService extends AccelerometerDataCaptur
       public void onResult(DataApi.DataItemResult dataItemResult) {
 
         Log.d(TAG, "Data result: " + dataItemResult.getDataItem());
+        getDataBlob().deleteFile();
         googleApiClient.disconnect();
       }
     });

@@ -72,4 +72,8 @@ public class AccelerometerDataBlob {
   public int getCount() {
     return count;
   }
+
+  public boolean deleteFile() {
+    return getFile().delete();
+  }
 }
